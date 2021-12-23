@@ -1,0 +1,16 @@
+<?php
+declare(strict_types=1);
+
+namespace App\src\Ship\Containers\Helpers;
+
+class Xmlhelper
+{
+
+    static public function toArray($data): array
+    {
+        $xml_data = simplexml_load_string($data);
+        $json = json_encode($xml_data);
+
+        return json_decode($json, true);
+    }
+}
