@@ -47,12 +47,12 @@ class RouteServiceProvider extends ServiceProvider
                 ->namespace($this->namespace)
                 ->group(base_path('routes/web.php'));
 
-            Route::prefix('api/currency/exchange')
+            Route::prefix('api/v1/currency')
                 ->middleware('api')
                 ->namespace($this->namespace)
                 ->group(
                     base_path(
-                        'app/src/Ship/Containers/Sections/CurrencyExchange/Api/routes/currency-exchange.php'
+                        'app/Src/Ship/Containers/Sections/Currency/Api/V1/routes/currency-exchange-v1.1.php'
                     )
                 );
         });
