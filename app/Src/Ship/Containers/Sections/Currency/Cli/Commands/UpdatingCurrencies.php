@@ -1,7 +1,10 @@
 <?php
 declare(strict_types=1);
+
 namespace App\Src\Ship\Containers\Sections\Currency\Cli\Commands;
 
+use App\Src\Ship\Containers\Sections\Currency\Api\V1\Models\Currency;
+use App\Src\Ship\Containers\Sections\Currency\Api\V1\Repositories\CurrencyRepository;
 use App\Src\Ship\Containers\Sections\Currency\Cli\Services\LoadCurrenciesService;
 use Exception;
 use Illuminate\Console\Command;
@@ -16,11 +19,13 @@ class UpdatingCurrencies extends Command
 
     protected $signature = 'currency:updating-currencies';
     protected $description = 'Command description';
+    private CurrencyRepository $currencyRepository;
 
 
-    public function __construct(LoadCurrenciesService $loadCurrenciesService)
+    public function __construct(LoadCurrenciesService $loadCurrenciesService, CurrencyRepository $currencyRepository)
     {
         $this->loadCurrenciesService = $loadCurrenciesService;
+        $this->currencyRepository = $currencyRepository;
         parent::__construct();
     }
 
@@ -29,17 +34,20 @@ class UpdatingCurrencies extends Command
     {
         $start = now();
         $this->comment(self::MESSAGE_START . '-' . $start);
+
         $time = $start->diffInSeconds(now());
 
         try {
             $this->loadCurrenciesService->handle();
 
+            $this->info(
+                sprintf(self::MESSAGE_FINISH . '%s сек', $time)
+            );
         } catch (Exception $ex) {
-          //  Logger::logger(self::LOG_CHANNEL, $ex->getMessage(), $ex->getTrace());
+            //  Logger::logger(self::LOG_CHANNEL, $ex->getMessage(), $ex->getTrace());
+            $this->info(
+                sprintf(self::MESSAGE_FINISH . '%s сек', $time)
+            );
         }
-
-        $this->info(
-            sprintf(self::MESSAGE_FINISH . '%s сек', $time)
-        );
     }
 }

@@ -17,6 +17,9 @@ class CurrencyExchangeRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'give_name_currency' => ['required', 'string', 'max:10'],
+            'give_count_currency' => ['required', 'integer'],
+            'take_name_currency' => ['required', 'string', 'max:10'],
         ];
     }
 

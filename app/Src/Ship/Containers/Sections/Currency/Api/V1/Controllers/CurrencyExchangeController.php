@@ -31,7 +31,7 @@ class CurrencyExchangeController extends Controller
     {
         $dto = (new CurrencyExchangeDto)->fillFromRequest($request);
 
-        $result = $this->currencyExchangeService->exchange($dto);
+        $result = $this->currencyExchangeService->handle($dto);
 
         return new CurrencyExchangeResource($result);
     }

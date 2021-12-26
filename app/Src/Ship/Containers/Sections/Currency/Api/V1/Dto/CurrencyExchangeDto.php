@@ -7,12 +7,9 @@ use App\Src\Ship\Base\Core\Dto\BaseDto;
 
 class CurrencyExchangeDto extends BaseDto
 {
-    public string $currency;
-    public float $rate;
-    public string $type;
-    public ?string $name = null;
-    public ?int $nominal = null;
-    public ?int $num_code = null;
+    public string $give_name_currency;
+    public int $give_count_currency;
+    public string $take_name_currency;
 
 
     protected function className(): string

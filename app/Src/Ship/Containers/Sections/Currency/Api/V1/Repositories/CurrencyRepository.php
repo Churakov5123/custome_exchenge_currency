@@ -6,6 +6,7 @@ namespace App\Src\Ship\Containers\Sections\Currency\Api\V1\Repositories;
 use App\Src\Ship\Base\Core\Repositories\BaseRepository;
 use App\Src\Ship\Containers\Sections\Currency\Api\V1\Dto\CreateCurrencyDto;
 use App\Src\Ship\Containers\Sections\Currency\Api\V1\Models\Currency;
+use Illuminate\Database\Eloquent\Collection;
 
 
 class CurrencyRepository extends BaseRepository
@@ -41,8 +42,14 @@ class CurrencyRepository extends BaseRepository
     }
 
 
-    public function getAll()
+    /**
+     * @param string $type
+     *
+     * @return Collection
+     */
+    public function getAllFromType(string $type): Collection
     {
-
+        return $this->startConditions()
+            ->where('type', $type)->get();
     }
 }
