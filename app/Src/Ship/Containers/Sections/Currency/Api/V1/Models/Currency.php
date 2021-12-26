@@ -31,7 +31,11 @@ class Currency extends Model
             'name',
             'type',
             'nominal',
-            'num_code'
+            'num_code',
+            'return_at'
         ];
 
+    protected $dates = [
+        'return_at'
+    ];
 }

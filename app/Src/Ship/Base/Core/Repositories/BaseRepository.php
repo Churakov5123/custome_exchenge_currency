@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\src\Ship\Base\Core\Repositories;
+namespace App\Src\Ship\Base\Core\Repositories;
 
 use Illuminate\Database\Eloquent\Model;
 

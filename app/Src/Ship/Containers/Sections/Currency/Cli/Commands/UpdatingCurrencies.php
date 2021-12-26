@@ -1,8 +1,6 @@
 <?php
-
+declare(strict_types=1);
 namespace App\Src\Ship\Containers\Sections\Currency\Cli\Commands;
-
-
 
 use App\Src\Ship\Containers\Sections\Currency\Cli\Services\LoadCurrenciesService;
 use Exception;

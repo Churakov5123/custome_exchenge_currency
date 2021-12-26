@@ -30,7 +30,7 @@ class CurrencyRepository extends BaseRepository
             'type' => $dto->type,
             'nominal' => $dto->nominal,
             'num_code' => $dto->num_code,
-
+            'return_at' => $dto->return_at,
         ]);
     }
 

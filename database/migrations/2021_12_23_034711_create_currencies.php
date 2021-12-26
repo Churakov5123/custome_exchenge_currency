@@ -21,6 +21,7 @@ class CreateCurrencies extends Migration
             $table->integer('nominal')->nullable();
             $table->decimal('rate', 8, 4);
             $table->integer('num_code')->nullable();
+            $table->timestamp("return_at")->nullable()->comment('Дата предоставленных данных');
 
             $table->timestamps();
 

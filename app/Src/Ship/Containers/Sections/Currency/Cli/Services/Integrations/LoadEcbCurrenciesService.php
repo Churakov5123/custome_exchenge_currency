@@ -10,11 +10,16 @@ use App\Src\Ship\Containers\Sections\Currency\Api\V1\Repositories\CurrencyReposi
 use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
-use Psr\Http\Message\StreamInterface;
+use Illuminate\Support\Carbon;
+
 
 class LoadEcbCurrenciesService
 {
     const SUCCESS_STATUS_SUCCESS = 200;
+    const BASE_URL = 'https://www.ecb.europa.eu';
+    const PREFIX = '/stats/eurofxref/eurofxref-daily.xml';
+    const METHOD_GET = 'GET';
+    const DEFAULT_NOMINAL = 1;
 
     private CurrencyRepository $currencyRepository;
     private Client $client;
@@ -25,7 +30,7 @@ class LoadEcbCurrenciesService
     public function __construct(CurrencyRepository $currencyRepository)
     {
         $this->currencyRepository = $currencyRepository;
-        $this->client = new Client(['base_uri' => 'https://www.ecb.europa.eu']);
+        $this->client = new Client(['base_uri' => self::BASE_URL]);
     }
 
 
@@ -41,21 +46,22 @@ class LoadEcbCurrenciesService
         }
     }
 
+
     /**
-     * @return StreamInterface
+     * @return string
      *
      * @throws GuzzleException
      */
-    private function getData(): StreamInterface
+    private function getData(): string
     {
         $response = $this->client->request(
-            'GET',
-            '/stats/eurofxref/eurofxref-daily.xml'
+            self::METHOD_GET,
+            self::PREFIX
         );
 
         if (self::SUCCESS_STATUS_SUCCESS === $response->getStatusCode()) {
 
-            return $response->getBody();
+            return $response->getBody()->getContents();
         }
 
         throw new Exception('Некорректный ответ сервера', $response->getStatusCode());
@@ -69,20 +75,20 @@ class LoadEcbCurrenciesService
      */
     private function prepareData(): array
     {
-        $currencies = Xmlhelper::toArray($this->getData());
+        $currencies = Xmlhelper::stringToArray($this->getData());
 
         $result = [];
-
-        if (!empty($currencies)) {
-            foreach ($currencies as $currency) {
+        
+        if (!empty($currencies['Cube']['Cube']['Cube'])) {
+            foreach ($currencies['Cube']['Cube']['Cube'] as $currency) {
                 $result[] = (new CreateCurrencyDto())->fillFromArray(
                     [
-                        'currency' => $currency['currency'],
-                        'rate' => $currency['rate'],
+                        'currency' => $currency['@attributes']['currency'],
+                        'rate' => floatval($currency['@attributes']['rate']),
                         'type' => Currency::TYPE_ECB,
-                        'name' => $currency['name'],
-                        'nominal' => $currency['nominal'],
-                        'num_code' => $currency['num_code']
+                        'name' => $currency['@attributes']['currency'],
+                        'nominal' => self::DEFAULT_NOMINAL,
+                        'return_at' => Carbon::parse($currencies['Cube']['Cube']['@attributes']['time']),
                     ]
                 );
             }

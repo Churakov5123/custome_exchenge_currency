@@ -1,12 +1,16 @@
 <?php
 declare(strict_types=1);
 
-namespace App\src\Ship\Containers\Helpers;
+namespace App\Src\Ship\Containers\Helpers;
 
 class Xmlhelper
 {
-
-    static public function toArray($data): array
+    /**
+     * @param string $data
+     *
+     * @return array
+     */
+    static public function stringToArray(string $data): array
     {
         $xml_data = simplexml_load_string($data);
         $json = json_encode($xml_data);
