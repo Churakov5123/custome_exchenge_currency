@@ -6,11 +6,20 @@ namespace App\Src\Ship\Containers\Sections\Currency\Api\V1\Services;
 use App\Src\Ship\Containers\Sections\Currency\Api\V1\Dto\CurrencyExchangeDto;
 use App\Src\Ship\Containers\Sections\Currency\Api\V1\Models\Currency;
 use App\Src\Ship\Containers\Sections\Currency\Api\V1\Repositories\CurrencyRepository;
+use Exception;
 use Illuminate\Database\Eloquent\Collection;
 
 class CurrencyExchangeService
 {
-    public const SOURCES_CURRENCY = Currency::TYPE_ECB;
+
+    private const CURRENCY_RUB = 'RUB';
+    private const CURRENCY_EUR = 'EUR';
+
+    private const CONFIGURED = [
+        Currency::TYPE_ECB => self::CURRENCY_EUR,
+        Currency::TYPE_CBR => self::CURRENCY_RUB,
+    ];
+
 
     private CurrencyRepository $currencyRepository;
 
@@ -19,59 +28,133 @@ class CurrencyExchangeService
         $this->currencyRepository = $currencyRepository;
     }
 
-
+    /**
+     * Точка входа.
+     *
+     * @param CurrencyExchangeDto $dto
+     * @return float
+     * @throws Exception
+     */
     public function handle(CurrencyExchangeDto $dto): float
     {
         return $this->exchangeProcessing($dto);
     }
 
-    private function exchangeProcessing(CurrencyExchangeDto $dto): float
+
+    /**
+     * @param CurrencyExchangeDto $dto
+     *
+     * @return float
+     * @throws Exception
+     */
+    private function exchangeProcessing(CurrencyExchangeDto $dto): array
     {
-        $courseData = $this->currencyRepository->getAllFromType(self::SOURCES_CURRENCY);
+        $courseData = $this->currencyRepository->getAllFromType($dto->type_source);
 
-        $giveNameCourse = $this->getСourse($courseData, $dto->give_name_currency);
+        // условие для базовой валюты, из конфига т.е получение в рубляхили или евро не важно.
+        if (in_array($dto->take_name_currency, self::CONFIGURED)) {
 
-        $takeNameCourse = $this->getСourse($courseData, $dto->take_name_currency);
+            return $this->exchangeForBaseCurrency($dto, $courseData);
+        }
 
-        return $this->calculateCurrency($giveNameCourse, $takeNameCourse, $dto->give_count_currency);
-    }
-
-    private function exchangeFromBaseCurrency()
-    {
-// это в случае с доларок рублю
-//        $give_name;
-//        $give_name_count;
-//
-//        $take_name;
-
-//        $give_name_count * $take_name_course;
-//
-//        //рубль к долару
-//        $give_name_count / $take_name
-
-        //евро к долару например отностельно рубля считается так
-       // ($give_name_course_in_ruble * $give_name_count) / $take_name_course_in_ruble) =так мы получаем количество валют
-
+        return $this->exchangeForNoBaseCurrency($dto, $courseData);
     }
 
 
-    private function exchangeFromNotBaseCurrency()
+    /**
+     * Обмен на базовую валюту рубль или доллар.
+     *
+     * @param CurrencyExchangeDto $dto
+     * @param Collection $courseData
+     *
+     * @return array
+     * @throws Exception
+     */
+    private function exchangeForBaseCurrency(CurrencyExchangeDto $dto, Collection $courseData): array
     {
+        $take_name_currency = self::CONFIGURED[array_search($dto->take_name_currency, self::CONFIGURED)];
 
+        $giveCurrency = $this->getCurrency($courseData, $dto->give_name_currency);
+
+        $amount_currency = $this->calculateForBaseCurrency($giveCurrency, $dto);
+
+        return [
+            'take_name_currency' => $take_name_currency,
+            'take_amount_currency' => $amount_currency
+        ];
     }
 
-    public function getСourse(Collection $collection, string $nameCurrency)
+
+    /**
+     * Обмен не на базовую валюту банка, но относительно нее.
+     *
+     * @param CurrencyExchangeDto $dto
+     * @param Collection $courseData
+     *
+     * @return array
+     * @throws Exception
+     */
+    private function exchangeForNoBaseCurrency(CurrencyExchangeDto $dto, Collection $courseData): array
     {
+        $giveCurrency = $this->getCurrency($courseData, $dto->give_name_currency);
 
+        $takeCurrency = $this->getCurrency($courseData, $dto->take_name_currency);
 
+        $amount_currency = $this->calculateForNoBaseCurrency($giveCurrency, $takeCurrency, $dto);
+
+        return [
+            'take_name_currency' => $dto->take_name_currency,
+            'take_amount_currency' => $amount_currency
+        ];
     }
 
-    public function calculateCurrency(float $giveNameCourse, float $takeNameCourse, int $give_count_currency)
+
+    /**
+     * Калькулятор для базовой валюты.
+     *
+     * @param Currency $giveCurrency
+     * @param CurrencyExchangeDto $dto
+     *
+     * @return float|int
+     */
+    private function calculateForBaseCurrency(Currency $giveCurrency, CurrencyExchangeDto $dto): float|int
     {
+        return ($giveCurrency->rate / $giveCurrency->nominal ?? 1) * $dto->give_count_currency;
+    }
 
-        //логика
+    /**
+     * Калькулятор не на базовую валюту банка, но относительно нее.
+     *
+     * @param Currency $giveCurrency
+     * @param Currency $takeCurrency
+     * @param CurrencyExchangeDto $dto
+     *
+     * @return float|int
+     */
+    private function calculateForNoBaseCurrency(Currency $giveCurrency, Currency $takeCurrency, CurrencyExchangeDto $dto): float|int
+    {
+        return (($giveCurrency->rate / $giveCurrency->nominal ?? 1)
+                * $dto->give_count_currency) /
+            ($takeCurrency->rate / $takeCurrency->nominal ?? 1);
+    }
 
 
+    /**
+     * @param Collection $collection
+     * @param string $nameCurrency
+     *
+     * @return Currency
+     * @throws Exception
+     */
+    public function getCurrency(Collection $collection, string $nameCurrency): Currency
+    {
+        $currency = $collection->where('currency', '=', $nameCurrency)->first();
 
+        if (empty($currency)) {
+
+            throw new Exception('Валюта не найдена');
+        }
+
+        return $currency;
     }
 }

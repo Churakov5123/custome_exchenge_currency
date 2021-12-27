@@ -9,12 +9,8 @@ class CurrencyExchangeResource extends JsonResource
     public function toArray($request)
     {
         return [
-            'id' => $this->id,
-            'language' => $this->language,
-            'language_code' => $this->language_code,
-            'available' => $this->available,
-            'activity' => $this->activity,
-            'domain' => $this->domain,
+            'take_name_currency' => $this->take_name_currency,
+            'take_amount_currency' => $this->take_amount_currency
         ];
     }
 }

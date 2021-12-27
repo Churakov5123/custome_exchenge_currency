@@ -20,6 +20,7 @@ class CurrencyExchangeRequest extends FormRequest
             'give_name_currency' => ['required', 'string', 'max:10'],
             'give_count_currency' => ['required', 'integer'],
             'take_name_currency' => ['required', 'string', 'max:10'],
+            'type_source' => ['required', 'string', 'max:10'],
         ];
     }
 

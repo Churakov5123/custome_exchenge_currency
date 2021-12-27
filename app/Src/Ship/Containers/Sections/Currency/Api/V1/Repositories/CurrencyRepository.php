@@ -36,12 +36,6 @@ class CurrencyRepository extends BaseRepository
     }
 
 
-    public function getItem()
-    {
-
-    }
-
-
     /**
      * @param string $type
      *
@@ -49,7 +43,20 @@ class CurrencyRepository extends BaseRepository
      */
     public function getAllFromType(string $type): Collection
     {
+        $currency = $this->geLastReturnAt();
+
         return $this->startConditions()
-            ->where('type', $type)->get();
+            ->where('type', $type)
+            ->where('return_at', $currency->return_at)
+            ->get();
+    }
+
+
+    /**
+     * @return Currency
+     */
+    private function geLastReturnAt(): Currency
+    {
+        $this->startConditions()->latest('return_at')->first();
     }
 }

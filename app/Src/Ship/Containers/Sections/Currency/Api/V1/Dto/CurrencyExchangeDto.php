@@ -10,6 +10,7 @@ class CurrencyExchangeDto extends BaseDto
     public string $give_name_currency;
     public int $give_count_currency;
     public string $take_name_currency;
+    public string $type_source;
 
 
     protected function className(): string
