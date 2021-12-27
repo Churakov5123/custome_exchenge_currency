@@ -17,7 +17,8 @@ https://www.cbr.ru/scripts/XML_daily.asp
 Decision:
 
 Используемый стек : Laravel 8/php 7.4, в качестве  ОРМ используется стандартный Active Record Laravel - Eloquent ORM.
-За основу проектирования архитектурного дизайна взят подход Porto, более подробно  https://github.com/Mahmoudz/Porto
+
+За основу проектирования архитектурного дизайна(но не весь) взят подход Porto, более подробно  https://github.com/Mahmoudz/Porto
 
 Преймущества:
 
@@ -30,3 +31,22 @@ Decision:
 -Адаптивность и эволюционируемость
 
 -Расширяемость и гибкость
+
+ Usage:
+ 
+ Консольная команда на запуск обновления курсов валют: 
+ php artisan currency:updating-currencies
+ 
+ Эндпоинт для обмена: 
+ api/v1/currency/exchange
+ 
+ Пример запроса :
+ 
+ {
+ 
+   "give_name_currency":"USD",
+   "give_count_currency" :100,
+   "take_name_currency":"CNY",
+   "type_source":"CBR"
+ 
+ }
