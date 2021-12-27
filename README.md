@@ -15,6 +15,7 @@ https://www.cbr.ru/scripts/XML_daily.asp
 Постарайтесь как можно полнее показать ваши знания и умения проектирования и написания кода.
 
 Decision:
+
 Используемый стек : Laravel 8/php 7.4, в качестве  ОРМ используется стандартный Active Record Laravel - Eloquent ORM.
 За основу проектирования архитектурного дизайна взят подход Porto, более подробно  https://github.com/Mahmoudz/Porto
 
