@@ -50,3 +50,12 @@ Decision:
    "type_source":"CBR"
  
  }
+
+Пример ответа :
+
+{
+	"data": {
+		"take_name_currency": "CNY",
+		"take_amount_currency": 636.94
+	}
+}
