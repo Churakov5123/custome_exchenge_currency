@@ -8,10 +8,10 @@ use Illuminate\Foundation\Http\FormRequest;
 class CurrencyExchangeRequest extends FormRequest
 {
 
-//    public function authorize(): bool
-//    {
-//        return false;
-//    }
+    public function authorize(): bool
+    {
+        return true;
+    }
 
 
     public function rules(): array
