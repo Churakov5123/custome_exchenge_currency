@@ -55,8 +55,9 @@ class CurrencyRepository extends BaseRepository
     /**
      * @return Currency
      */
-    private function geLastReturnAt(): Currency
+    public function geLastReturnAt(): Currency
     {
-        $this->startConditions()->latest('return_at')->first();
+        return Currency::orderByRaw('return_at DESC')
+            ->get()->first();
     }
 }

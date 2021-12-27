@@ -3,12 +3,10 @@ declare(strict_types=1);
 
 namespace App\Src\Ship\Containers\Sections\Currency\Api\V1\Presenters;
 
-use Illuminate\Database\Eloquent\Model;
-
 /**
- * Подгтовленне представление валюты которую обменяли.
+ * Подгтовленное представление валюты которую уже обменяли.
  */
-class ExchangePresenter extends Model
+class ExchangePresenter
 {
     public string $take_name_currency;
 
@@ -23,9 +21,5 @@ class ExchangePresenter extends Model
     {
         $this->take_name_currency = $take_name_currency;
         $this->take_amount_currency = $take_amount_currency;
-
-        parent::__construct();
     }
-
-
 }

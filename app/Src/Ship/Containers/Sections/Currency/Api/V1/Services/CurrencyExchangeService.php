@@ -80,7 +80,16 @@ class CurrencyExchangeService
 
         $giveCurrency = $this->getCurrency($courseData, $dto->give_name_currency);
 
-        $amount_currency = $this->calculateForBaseCurrency($giveCurrency, $dto);
+        if ($dto->type_source !== array_search($dto->take_name_currency, self::CONFIGURED)) {
+            //когда тип истоника не соотностится с базовой валютой
+            $takeCurrency = $this->getCurrency($courseData, $dto->take_name_currency);
+
+            $amount_currency = $this->calculateForNoBaseCurrency($giveCurrency, $takeCurrency, $dto);
+
+        } else {
+            //базовый случай
+            $amount_currency = $this->calculateForBaseCurrency($giveCurrency, $dto);
+        }
 
         return [
             'take_name_currency' => $take_name_currency,
