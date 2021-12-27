@@ -5,6 +5,7 @@ namespace App\Src\Ship\Containers\Sections\Currency\Api\V1\Services;
 
 use App\Src\Ship\Containers\Sections\Currency\Api\V1\Dto\CurrencyExchangeDto;
 use App\Src\Ship\Containers\Sections\Currency\Api\V1\Models\Currency;
+use App\Src\Ship\Containers\Sections\Currency\Api\V1\Presenters\ExchangePresenter;
 use App\Src\Ship\Containers\Sections\Currency\Api\V1\Repositories\CurrencyRepository;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
@@ -32,12 +33,15 @@ class CurrencyExchangeService
      * Точка входа.
      *
      * @param CurrencyExchangeDto $dto
-     * @return float
+     * @return ExchangePresenter
+     *
      * @throws Exception
      */
-    public function handle(CurrencyExchangeDto $dto): float
+    public function handle(CurrencyExchangeDto $dto): ExchangePresenter
     {
-        return $this->exchangeProcessing($dto);
+        $result = $this->exchangeProcessing($dto);
+
+        return new ExchangePresenter($result['take_name_currency'], $result['take_amount_currency']);
     }
 
 
@@ -115,12 +119,15 @@ class CurrencyExchangeService
      * @param Currency $giveCurrency
      * @param CurrencyExchangeDto $dto
      *
-     * @return float|int
+     * @return float
      */
-    private function calculateForBaseCurrency(Currency $giveCurrency, CurrencyExchangeDto $dto): float|int
+    private function calculateForBaseCurrency(Currency $giveCurrency, CurrencyExchangeDto $dto): float
     {
-        return ($giveCurrency->rate / $giveCurrency->nominal ?? 1) * $dto->give_count_currency;
+        $amount = ($giveCurrency->rate / $giveCurrency->nominal ?? 1) * $dto->give_count_currency;
+
+        return round($amount, 2);
     }
+
 
     /**
      * Калькулятор не на базовую валюту банка, но относительно нее.
@@ -129,13 +136,15 @@ class CurrencyExchangeService
      * @param Currency $takeCurrency
      * @param CurrencyExchangeDto $dto
      *
-     * @return float|int
+     * @return float
      */
-    private function calculateForNoBaseCurrency(Currency $giveCurrency, Currency $takeCurrency, CurrencyExchangeDto $dto): float|int
+    private function calculateForNoBaseCurrency(Currency $giveCurrency, Currency $takeCurrency, CurrencyExchangeDto $dto): float
     {
-        return (($giveCurrency->rate / $giveCurrency->nominal ?? 1)
+        $amount = (($giveCurrency->rate / $giveCurrency->nominal ?? 1)
                 * $dto->give_count_currency) /
             ($takeCurrency->rate / $takeCurrency->nominal ?? 1);
+
+        return round($amount, 2);
     }
 
 

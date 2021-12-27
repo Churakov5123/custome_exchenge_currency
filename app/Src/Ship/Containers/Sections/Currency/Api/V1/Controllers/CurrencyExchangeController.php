@@ -22,10 +22,12 @@ class CurrencyExchangeController extends Controller
 
 
     /**
+     * Энд-поинт обмена валют.
      *
      * @param CurrencyExchangeRequest $request
-     *
      * @return CurrencyExchangeResource
+     *
+     * @throws \Exception
      */
     public function exchange(CurrencyExchangeRequest $request): CurrencyExchangeResource
     {
