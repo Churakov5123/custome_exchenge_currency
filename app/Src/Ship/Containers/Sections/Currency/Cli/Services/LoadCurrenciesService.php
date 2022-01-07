@@ -31,8 +31,6 @@ class LoadCurrenciesService
 
     /**
      * @return void
-     *
-     * @throws GuzzleException
      */
     public function handle(): void
     {

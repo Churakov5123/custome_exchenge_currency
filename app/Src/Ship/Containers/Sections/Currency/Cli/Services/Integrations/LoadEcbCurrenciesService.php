@@ -7,22 +7,19 @@ use App\Src\Ship\Containers\Helpers\Xmlhelper;
 use App\Src\Ship\Containers\Sections\Currency\Api\V1\Dto\CreateCurrencyDto;
 use App\Src\Ship\Containers\Sections\Currency\Api\V1\Models\Currency;
 use App\Src\Ship\Containers\Sections\Currency\Api\V1\Repositories\CurrencyRepository;
-use Exception;
+use App\Src\Ship\Containers\Sections\Currency\Cli\Services\interfaces\BaseLoadCurrenciesService;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Carbon;
 
 
-class LoadEcbCurrenciesService
+class LoadEcbCurrenciesService extends BaseLoadCurrenciesService
 {
-    const SUCCESS_STATUS_SUCCESS = 200;
-    const BASE_URL = 'https://www.ecb.europa.eu';
-    const PREFIX = '/stats/eurofxref/eurofxref-daily.xml';
-    const METHOD_GET = 'GET';
-    const DEFAULT_NOMINAL = 1;
+    private const BASE_URL = 'https://www.ecb.europa.eu';
+    protected const PREFIX = '/stats/eurofxref/eurofxref-daily.xml';
+    protected const METHOD_GET = 'GET';
+    private const DEFAULT_NOMINAL = 1;
 
-    private CurrencyRepository $currencyRepository;
-    private Client $client;
 
     /**
      * @param CurrencyRepository $currencyRepository
@@ -35,50 +32,18 @@ class LoadEcbCurrenciesService
 
 
     /**
-     * @return void
+     * Полиморфизм с уникальной реализацией.
      *
-     * @throws GuzzleException
-     */
-    public function execute(): void
-    {
-        foreach ($this->prepareData() as $item) {
-            $this->currencyRepository->create($item);
-        }
-    }
-
-
-    /**
-     * @return string
-     *
-     * @throws GuzzleException
-     */
-    private function getData(): string
-    {
-        $response = $this->client->request(
-            self::METHOD_GET,
-            self::PREFIX
-        );
-
-        if (self::SUCCESS_STATUS_SUCCESS === $response->getStatusCode()) {
-
-            return $response->getBody()->getContents();
-        }
-
-        throw new Exception('Некорректный ответ сервера', $response->getStatusCode());
-    }
-
-
-    /**
      * @return array
      *
      * @throws GuzzleException
      */
-    private function prepareData(): array
+    protected function prepareData(): array
     {
         $currencies = Xmlhelper::stringToArray($this->getData());
 
         $result = [];
-        
+
         if (!empty($currencies['Cube']['Cube']['Cube'])) {
             foreach ($currencies['Cube']['Cube']['Cube'] as $currency) {
                 $result[] = (new CreateCurrencyDto())->fillFromArray(

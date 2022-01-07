@@ -44,7 +44,8 @@ class UpdatingCurrencies extends Command
                 sprintf(self::MESSAGE_FINISH . '%s сек', $time)
             );
         } catch (Exception $ex) {
-            //  Logger::logger(self::LOG_CHANNEL, $ex->getMessage(), $ex->getTrace());
+            dd($ex);
+            // Logger::logger(self::LOG_CHANNEL, $ex->getMessage(), $ex->getTrace());
             $this->info(
                 sprintf(self::MESSAGE_FINISH . '%s сек', $time)
             );
